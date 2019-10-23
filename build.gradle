@@ -96,6 +96,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 sourceCompatibility = 1.8
 group   = 'com.adaptris'
 version = releaseVersion
+generateLombokConfig.enabled = false
 def versionDir = "$buildDir/version"
 
 repositories {
