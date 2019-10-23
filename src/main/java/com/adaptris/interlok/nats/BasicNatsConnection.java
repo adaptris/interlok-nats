@@ -1,11 +1,16 @@
 package com.adaptris.interlok.nats;
 
 import javax.validation.constraints.NotBlank;
+import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.ConnectionErrorHandler;
+import com.adaptris.core.CoreException;
+import com.adaptris.interlok.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import io.nats.client.Connection;
 import io.nats.client.Nats;
+import io.nats.client.Options;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -48,7 +53,15 @@ public class BasicNatsConnection extends NatsConnection {
   @Setter
   @NotBlank
   @NonNull
-  private String url;
+  @InputFieldDefault(value = Options.DEFAULT_URL)
+  @AutoPopulated
+  private String url = Options.DEFAULT_URL;
+
+  @Override
+  protected void prepareConnection() throws CoreException {
+    super.prepareConnection();
+    Args.notNull(url, "url");
+  }
 
   @Override
   protected Connection connect() throws Exception {
@@ -58,5 +71,10 @@ public class BasicNatsConnection extends NatsConnection {
   public <T extends BasicNatsConnection> T withUrl(String u) {
     setUrl(u);
     return (T) this;
+  }
+
+  @Override
+  protected String connectionName() {
+    return url;
   }
 }

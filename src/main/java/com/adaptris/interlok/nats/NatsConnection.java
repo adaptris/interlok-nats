@@ -3,9 +3,10 @@ package com.adaptris.interlok.nats;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.ObjectUtils;
-import com.adaptris.core.AdaptrisConnectionImp;
+import com.adaptris.core.AllowsRetriesConnection;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.util.TimeInterval;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.MessageHandler;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 
 @NoArgsConstructor
-public abstract class NatsConnection extends AdaptrisConnectionImp {
+public abstract class NatsConnection extends AllowsRetriesConnection {
 
   private transient Connection currentConnection;
   // otherwise it gets emitted by XSTream
@@ -48,7 +49,7 @@ public abstract class NatsConnection extends AdaptrisConnectionImp {
 
   @Synchronized
   public Connection clientConnection() throws Exception {
-    currentConnection = ObjectUtils.defaultIfNull(currentConnection, connect());
+    currentConnection = ObjectUtils.defaultIfNull(currentConnection, tryConnect());
     return currentConnection;
   }
 
@@ -68,4 +69,40 @@ public abstract class NatsConnection extends AdaptrisConnectionImp {
 
   protected abstract Connection connect() throws Exception;
 
+  protected abstract String connectionName();
+
+  private Connection tryConnect() throws Exception {
+    int attemptCount = 0;
+    Connection c = null;
+    while (c == null) {
+      try {
+        attemptCount++;
+        c = connect();
+      } catch (Exception e) {
+        if (logWarning(attemptCount)) {
+          log.warn("Connection attempt [{}] failed for {}", attemptCount, connectionName(), e);
+        }
+        exceedsMaxAttempts(attemptCount, e);
+        log.trace(createLoggingStatement(attemptCount));
+        Thread.sleep(connectionRetryInterval());
+        continue;
+      }
+    }
+    return c;
+  }
+
+  // Rethrows the exception if the max attempts are exceeded; primary use is for
+  // testability.
+  protected <T extends Exception> void exceedsMaxAttempts(int attemptCount, T e) throws T {
+    if (connectionAttempts() != -1 && attemptCount >= connectionAttempts()) {
+      log.error("Failed to make a onnection");
+      throw e;
+    }
+  }
+
+  public <T extends NatsConnection> T withConnectionRetries(int i, TimeInterval t) {
+    setConnectionAttempts(i);
+    setConnectionRetryInterval(t);
+    return (T) this;
+  }
 }

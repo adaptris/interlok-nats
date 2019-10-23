@@ -4,8 +4,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import com.adaptris.util.TimeInterval;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Message;
@@ -45,11 +47,12 @@ public class MockNatsConnection extends BasicNatsConnection {
       // return mockDispatcher;
       // }
       // });
-
     }
     this.exceptionOnConnect = exceptionOnConnect;
     Mockito.when(mockReply.getData()).thenReturn("goodbye cruel world".getBytes(StandardCharsets.UTF_8));
     Mockito.when(mockConn.getMaxPayload()).thenReturn(1024L);
+    setConnectionAttempts(5);
+    setConnectionRetryInterval(new TimeInterval(100L, TimeUnit.MILLISECONDS));
   }
 
   @Override
