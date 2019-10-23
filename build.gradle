@@ -297,6 +297,14 @@ task umlJavadoc(type: Javadoc) {
   }
 }
 
+task lgtmCompile(type: JavaCompile) {
+  group 'Build'
+  description 'Compile for lgtm'
+
+  source = sourceSets.main.extensions.delombokTask
+  destinationDir = sourceSets.main.java.outputDir
+  classpath = project.sourceSets.main.compileClasspath
+}
 
 artifacts {
   archives javadocJar
