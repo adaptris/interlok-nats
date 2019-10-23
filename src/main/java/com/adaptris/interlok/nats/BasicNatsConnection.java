@@ -20,7 +20,8 @@ import lombok.Setter;
  * Basic Connection to a NATS server.
  * <p>
  * This connection assumes that {@code Nats#connect(String)} is sufficient configuration for connecting to your NATS server (i.e.
- * everything you need is configurable via the URL).
+ * everything you need is configurable via the URL). Generally put your 'closest' NATS server as the URL, since it will discover
+ * other servers after it initially connects and use those as required.
  * </p>
  * <p>
  * Configuring any kind of {@link ConnectionErrorHandler} has no effect on this type of connection, as we will be relying on the
@@ -41,7 +42,8 @@ public class BasicNatsConnection extends NatsConnection {
    * server.
    * 
    * <p>
-   * The Java client generally expects URLs of the form {@code nats://hostname:port} but has support for the additional forms:
+   * The Java client generally expects URLs of the form {@code nats://hostname:port} but has support for the additional forms (it
+   * can be a list that is comma separated):
    * <ul>
    * <li>{@code nats://user:pass@hostname:port}</li>
    * <li>{@code nats://token@hostname:port}</li>
@@ -75,6 +77,6 @@ public class BasicNatsConnection extends NatsConnection {
 
   @Override
   protected String connectionName() {
-    return url;
+    return getUrl();
   }
 }

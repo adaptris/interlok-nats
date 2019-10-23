@@ -27,7 +27,9 @@ public abstract class NatsConnection extends AllowsRetriesConnection {
   @Override
   protected void initConnection() throws CoreException {
     try {
-      clientConnection();
+      Connection c = clientConnection();
+      log.trace("Connected to [{}]", c.getConnectedUrl());
+      log.trace("Discovered Servers [{}]", c.getServers());
     } catch (Exception e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
