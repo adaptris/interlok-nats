@@ -297,6 +297,10 @@ task umlJavadoc(type: Javadoc) {
   }
 }
 
+delombok {
+  target = new File("${project.projectDir}/src/main/generated")
+}
+
 task lgtmCompile(type: JavaCompile) {
   group 'Build'
   description 'Compile for lgtm'
