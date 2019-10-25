@@ -13,7 +13,6 @@ import io.nats.client.Nats;
 import io.nats.client.Options;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 /**
@@ -54,7 +53,6 @@ public class BasicNatsConnection extends NatsConnection {
   @Getter
   @Setter
   @NotBlank
-  @NonNull
   @InputFieldDefault(value = Options.DEFAULT_URL)
   @AutoPopulated
   private String url = Options.DEFAULT_URL;
