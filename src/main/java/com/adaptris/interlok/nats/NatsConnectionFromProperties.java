@@ -3,13 +3,10 @@ package com.adaptris.interlok.nats;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
-import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.ConnectionErrorHandler;
 import com.adaptris.core.CoreException;
-import com.adaptris.interlok.util.Args;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairBag;
 import com.adaptris.util.KeyValuePairSet;
@@ -63,8 +60,6 @@ public class NatsConnectionFromProperties extends NatsConnection {
    */
   @Getter
   @Setter
-  @AutoPopulated
-  @NotNull
   private KeyValuePairSet connectionProperties = new KeyValuePairSet();
 
   private transient String connectionName = "No Configured Connection Name";
@@ -72,7 +67,6 @@ public class NatsConnectionFromProperties extends NatsConnection {
   @Override
   protected void prepareConnection() throws CoreException {
     super.prepareConnection();
-    Args.notNull(connectionProperties, "connectionProperties");
     connectionName = findConnectionName(connectionProperties());
   }
 
