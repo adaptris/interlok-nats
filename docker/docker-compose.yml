@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  nats_master:
+    container_name: nats_master
+    image: nats:linux
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    networks:
+      - nats_core
+    entrypoint: /nats-server -c nats-server.conf -DV
+
+  nats_2:
+    container_name: nats_2
+    image: nats:linux
+    ports:
+      - "14222:4222"
+      - "16222:6222"
+      - "18222:8222"
+    networks:
+      - nats_core
+    links:
+      - nats_master:nats_master
+    entrypoint: /nats-server -c nats-server.conf --routes=nats-route://ruser:T0pS3cr3t@nats_master:6222 -DV
+
+networks:
+  nats_core:
+    name: nats_core
