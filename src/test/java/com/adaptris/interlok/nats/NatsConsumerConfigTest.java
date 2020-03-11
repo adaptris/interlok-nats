@@ -6,8 +6,9 @@ import com.adaptris.core.StandaloneConsumer;
 
 public class NatsConsumerConfigTest extends ConsumerCase {
 
-  public NatsConsumerConfigTest(String s) {
-    super(s);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
   @Override
