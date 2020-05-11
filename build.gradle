@@ -8,9 +8,9 @@ plugins {
   id 'jacoco'
   // Manage optional dependencies in maven pom.
   id 'nebula.optional-base' version '5.0.3'
-  id 'com.github.spotbugs' version '3.0.0'
-  id "io.freefair.lombok" version "4.1.6"
-  id 'org.owasp.dependencycheck' version '5.3.0'
+  id 'com.github.spotbugs' version '4.0.5'
+  id "io.freefair.lombok" version "5.0.0"
+  id 'org.owasp.dependencycheck' version '5.3.2.1'
 }
 
 ext {
@@ -30,9 +30,9 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  log4j2Version = "2.13.0"
-  mockitoVersion = '3.2.4'
-  powermockVersion = '2.0.5'
+  log4j2Version = "2.13.2"
+  mockitoVersion = '3.3.3'
+  // powermockVersion = '2.0.5'
 }
 
 ext.testResourcesDir = { ->
@@ -123,6 +123,11 @@ configurations {
   all*.exclude group: 'org.codehaus.woodstox'
   all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
   all*.exclude group: 'com.vaadin.external.google', module: 'android-json'
+  // INTERLOK-3197 exclude old javax.mail
+  all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+  all*.exclude group: 'javax.validation', module: 'validation-api'
+  all*.exclude group: 'javax.activation', module: 'activation'
+  all*.exclude group: 'javax.activation', module: 'javax.activation-api'
 }
 
 configurations.all {
@@ -132,7 +137,7 @@ configurations.all {
 dependencies {
   compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  compile ("io.nats:jnats:2.6.6")
+  compile ("io.nats:jnats:2.6.7")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
@@ -147,9 +152,9 @@ dependencies {
   testImplementation ("org.apache.logging.log4j:log4j-api:$log4j2Version")
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
   testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
-  testImplementation ("org.powermock:powermock-module-junit4:$powermockVersion")
-  testImplementation ("org.powermock:powermock-api-mockito2:$powermockVersion")
-  testImplementation ("org.powermock:powermock-core:$powermockVersion")
+  // testImplementation ("org.powermock:powermock-module-junit4:$powermockVersion")
+  // testImplementation ("org.powermock:powermock-api-mockito2:$powermockVersion")
+  // testImplementation ("org.powermock:powermock-core:$powermockVersion")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
 }
@@ -344,22 +349,28 @@ publishing {
   }
 }
 
-spotbugs {
+spotbugsMain {
   effort = "max"
   reportLevel = "high"
+  // showProgress = "true"
+  effort = "max"
+  // Ignore failures?
+  // ignoreFailures = false
+  reports {
+    xml {
+      enabled = false
+    }
+    html {
+      enabled = true
+    }
+  }
+  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
+  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
 }
 
 // disable spotbugsTests which checks our test code..
 spotbugsTest.enabled = false
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-  reports {
-    xml.enabled = false
-    html.enabled = true
-  }
-  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
-  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
-}
 
 dependencyCheck  {
   suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
