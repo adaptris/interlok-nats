@@ -376,6 +376,8 @@ spotbugsTest.enabled = false
 
 dependencyCheck  {
   suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
+  failBuildOnCVSS = 7.0
+  skipConfigurations = [ "antSql", "spotbugs", "umlDoclet", "offlineJavadocPackages", "javadoc" ]
 }
 
 javadoc.dependsOn offlinePackageList,umlJavadoc
