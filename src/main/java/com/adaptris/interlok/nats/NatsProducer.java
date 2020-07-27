@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Optional;
 import javax.validation.Valid;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
@@ -42,6 +43,7 @@ import lombok.Setter;
 @ComponentProfile(summary = "Send a message to a NATS server", tag = "nats.io, nats",
     recommended = {NatsConnection.class}, since = "3.9.3")
 @NoArgsConstructor
+@DisplayOrder(order = {"subject"})
 public class NatsProducer extends RequestReplyProducerImp {
 
   /**

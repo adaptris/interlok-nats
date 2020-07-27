@@ -4,6 +4,7 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
@@ -37,6 +38,7 @@ import lombok.Setter;
 @XStreamAlias("nats-standard-consumer")
 @ComponentProfile(summary = "Consumer implementation for NATS.io", tag = "nats.io, nats", since = "3.9.3")
 @NoArgsConstructor
+@DisplayOrder(order = {"subject", "queueGroup"})
 public class NatsConsumer extends AdaptrisMessageConsumerImp {
 
   /**
