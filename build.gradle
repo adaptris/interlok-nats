@@ -30,7 +30,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  mockitoVersion = '3.5.5'
+  mockitoVersion = '3.5.7'
   // powermockVersion = '2.0.5'
 }
 
