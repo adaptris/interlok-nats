@@ -17,7 +17,7 @@ public class NatsConsumerTest {
 
   @Test
   public void testLocationKey() throws Exception {
-    NatsConsumer c = new NatsConsumer().withDestination(new ConfiguredConsumeDestination("hello"));
+    NatsConsumer c = new NatsConsumer().withSubject("hello");
     assertEquals(NatsConstants.NATS_SUBJECT, c.consumeLocationKey());
   }
 
@@ -25,7 +25,7 @@ public class NatsConsumerTest {
   public void testConsumer() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
     MockMessageListener mockListener = new MockMessageListener();
-    NatsConsumer c = new NatsConsumer().withDestination(new ConfiguredConsumeDestination("hello"));
+    NatsConsumer c = new NatsConsumer().withSubject("hello");
     Message msg = Mockito.mock(Message.class);
     Mockito.when(msg.getData()).thenReturn("hello world".getBytes(StandardCharsets.UTF_8));
     Mockito.when(msg.getSID()).thenReturn("subscriptionID");
@@ -49,7 +49,7 @@ public class NatsConsumerTest {
   public void testConsumer_QueueGroup() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
     MockMessageListener mockListener = new MockMessageListener();
-    NatsConsumer c = new NatsConsumer().withDestination(new ConfiguredConsumeDestination("hello")).withQueueGroup("group");
+    NatsConsumer c = new NatsConsumer().withSubject("hello").withQueueGroup("group");
     Message msg = Mockito.mock(Message.class);
     Mockito.when(msg.getData()).thenReturn("hello world".getBytes(StandardCharsets.UTF_8));
     Mockito.when(msg.getSID()).thenReturn("subscriptionID");
@@ -73,7 +73,8 @@ public class NatsConsumerTest {
   public void testConsumer_ConnectionException() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(true, false);
     MockMessageListener mockListener = new MockMessageListener();
-    NatsConsumer c = new NatsConsumer().withDestination(new ConfiguredConsumeDestination("hello")).withQueueGroup("group");
+    NatsConsumer c = new NatsConsumer().withQueueGroup("group");
+    c.setDestination(new ConfiguredConsumeDestination("hello"));
     StandaloneConsumer consumer = new StandaloneConsumer(conn, c);
     consumer.registerAdaptrisMessageListener(mockListener);
     try {
@@ -87,7 +88,7 @@ public class NatsConsumerTest {
   public void testConsumer_ConsumerException() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
     MockMessageListener mockListener = new MockMessageListener();
-    NatsConsumer c = new NatsConsumer().withDestination(new ConfiguredConsumeDestination("hello")).withQueueGroup("group");
+    NatsConsumer c = new NatsConsumer().withSubject("hello").withQueueGroup("group");
     StandaloneConsumer consumer = new StandaloneConsumer(conn, c);
     consumer.registerAdaptrisMessageListener(mockListener);
     try {

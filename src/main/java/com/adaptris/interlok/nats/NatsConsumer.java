@@ -1,13 +1,18 @@
 package com.adaptris.interlok.nats;
 
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
+import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import io.nats.client.Dispatcher;
 import lombok.Getter;
@@ -16,7 +21,7 @@ import lombok.Setter;
 
 /**
  * Consumer implementation for NATS.io.
- * 
+ *
  * <p>
  * This uses the NATS core API, and as a result does not offer anything similar to JMS Topic durable susbscribers; NATS core offers
  * an at most once quality of service. If a subscriber is not listening on the subject (no subject match), or is not active when the
@@ -26,13 +31,14 @@ import lombok.Setter;
  * <p>
  * <strong>When the consumer is stopped; then we automatically unsubscribe from the subscription</strong>
  * </p>
- * 
+ *
  * @config nats-standard-consumer
  *
  */
 @XStreamAlias("nats-standard-consumer")
 @ComponentProfile(summary = "Consumer implementation for NATS.io", tag = "nats.io, nats", since = "3.9.3")
 @NoArgsConstructor
+@DisplayOrder(order = {"subject", "queueGroup"})
 public class NatsConsumer extends AdaptrisMessageConsumerImp {
 
   /**
@@ -49,11 +55,33 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
   @AdvancedConfig
   private String queueGroup;
 
+  /**
+   * The consume destination contains the NATS subject.
+   */
+  @Getter
+  @Setter
+  @Deprecated
+  @Valid
+  @Removal(version = "4.0.0", message = "Use 'subject' instead")
+  private ConsumeDestination destination;
+
+  /**
+   * The Subject for the NATS subscription
+   */
+  @Getter
+  @Setter
+  // Needs to be @NotBlank when destination is removed.
+  private String subject;
+
   private transient Dispatcher dispatcher = null;
+  private boolean destinationWarningLogged;
 
   @Override
   public void prepare() throws CoreException {
-
+    DestinationHelper.logWarningIfNotNull(destinationWarningLogged,
+        () -> destinationWarningLogged = true, getDestination(),
+        "{} uses destination, use subject instead", LoggingHelper.friendlyName(this));
+    DestinationHelper.mustHaveEither(getSubject(), getDestination());
   }
 
   @Override
@@ -65,7 +93,7 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
         retrieveAdaptrisMessageListener().onAdaptrisMessage(am);
         Thread.currentThread().setName(oldName);
       });
-      String subject = getDestination().getDestination();
+      String subject = subject();
       if (!StringUtils.isBlank(getQueueGroup())) {
         dispatcher.subscribe(subject, getQueueGroup());
       } else {
@@ -87,9 +115,8 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
     return this;
   }
 
-
-  public NatsConsumer withDestination(ConsumeDestination d) {
-    setDestination(d);
+  public NatsConsumer withSubject(String s) {
+    setSubject(s);
     return this;
   }
 
@@ -98,4 +125,12 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
     return NatsConstants.NATS_SUBJECT;
   }
 
+  private String subject() {
+    return DestinationHelper.consumeDestination(getSubject(), getDestination());
+  }
+
+  @Override
+  protected String newThreadName() {
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
+  }
 }
