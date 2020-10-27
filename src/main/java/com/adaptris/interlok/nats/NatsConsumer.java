@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.annotation.Removal;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
@@ -62,7 +62,7 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
   @Setter
   @Deprecated
   @Valid
-  @Removal(version = "4.0.0", message = "Use 'subject' instead")
+  @ConfigDeprecated(removalVersion = "4.0", message = "Use 'subject' instead", groups = Deprecated.class)
   private ConsumeDestination destination;
 
   /**
