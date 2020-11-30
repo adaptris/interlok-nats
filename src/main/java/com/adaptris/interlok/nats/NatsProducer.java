@@ -7,7 +7,7 @@ import javax.validation.Valid;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.annotation.Removal;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageEncoder;
 import com.adaptris.core.CoreException;
@@ -54,7 +54,7 @@ public class NatsProducer extends RequestReplyProducerImp {
   @Setter
   @Deprecated
   @Valid
-  @Removal(version = "4.0.0", message = "Use 'subject' instead")
+  @ConfigDeprecated(removalVersion = "4.0", message = "Use 'subject' instead", groups = Deprecated.class)
   private ProduceDestination destination;
 
   /**
