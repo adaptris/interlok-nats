@@ -338,6 +338,7 @@ publishing {
         properties.appendNode("tags", "nats.io,nats")
         properties.appendNode("license", "false")
         properties.appendNode("externalUrl", "https://nats.io/")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-nats")
       }
     }
   }
