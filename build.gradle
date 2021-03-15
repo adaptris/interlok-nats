@@ -69,10 +69,8 @@ ext.hasGraphViz = { ->
 
 ext.gitBranchNameOrTimestamp = { branchName ->
   if (branchName.equals("HEAD") || branchName.equals("develop") || branchName.startsWith("release")) {
-    print "using Date"
     return new Date().format('HH:mm:ss z');
   }
-  print "using brancName"
   return branchName;
 }
 

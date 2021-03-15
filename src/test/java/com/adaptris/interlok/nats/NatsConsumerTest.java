@@ -5,12 +5,11 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.BaseCase;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.interlok.junit.scaffolding.BaseCase;
 import io.nats.client.Message;
 
 public class NatsConsumerTest {
@@ -74,7 +73,7 @@ public class NatsConsumerTest {
     MockNatsConnection conn = new MockNatsConnection(true, false);
     MockMessageListener mockListener = new MockMessageListener();
     NatsConsumer c = new NatsConsumer().withQueueGroup("group");
-    c.setDestination(new ConfiguredConsumeDestination("hello"));
+    c.setSubject("hello");
     StandaloneConsumer consumer = new StandaloneConsumer(conn, c);
     consumer.registerAdaptrisMessageListener(mockListener);
     try {

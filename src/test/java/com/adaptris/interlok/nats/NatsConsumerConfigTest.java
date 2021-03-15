@@ -1,14 +1,9 @@
 package com.adaptris.interlok.nats;
 
-import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
+import com.adaptris.interlok.junit.scaffolding.ExampleConsumerCase;
 
-public class NatsConsumerConfigTest extends ConsumerCase {
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+public class NatsConsumerConfigTest extends ExampleConsumerCase {
 
   @Override
   protected StandaloneConsumer retrieveObjectForSampleConfig() {
