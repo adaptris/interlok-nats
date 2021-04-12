@@ -1,18 +1,16 @@
 package com.adaptris.interlok.nats;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import org.apache.commons.lang3.StringUtils;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
-import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.interlok.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import io.nats.client.Dispatcher;
 import lombok.Getter;
@@ -56,21 +54,11 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
   private String queueGroup;
 
   /**
-   * The consume destination contains the NATS subject.
-   */
-  @Getter
-  @Setter
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0", message = "Use 'subject' instead", groups = Deprecated.class)
-  private ConsumeDestination destination;
-
-  /**
    * The Subject for the NATS subscription
    */
   @Getter
   @Setter
-  // Needs to be @NotBlank when destination is removed.
+  @NotBlank
   private String subject;
 
   private transient Dispatcher dispatcher = null;
@@ -78,10 +66,7 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
 
   @Override
   public void prepare() throws CoreException {
-    DestinationHelper.logWarningIfNotNull(destinationWarningLogged,
-        () -> destinationWarningLogged = true, getDestination(),
-        "{} uses destination, use subject instead", LoggingHelper.friendlyName(this));
-    DestinationHelper.mustHaveEither(getSubject(), getDestination());
+    Args.notBlank(getSubject(), "subject");
   }
 
   @Override
@@ -126,11 +111,11 @@ public class NatsConsumer extends AdaptrisMessageConsumerImp {
   }
 
   private String subject() {
-    return DestinationHelper.consumeDestination(getSubject(), getDestination());
+    return getSubject();
   }
 
   @Override
   protected String newThreadName() {
-    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener());
   }
 }

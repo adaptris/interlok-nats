@@ -3,20 +3,18 @@ package com.adaptris.interlok.nats;
 import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
 import java.time.Duration;
 import java.util.Optional;
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageEncoder;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.RequestReplyProducerImp;
 import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.interlok.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import io.nats.client.Connection;
 import io.nats.client.Message;
@@ -47,24 +45,13 @@ import lombok.Setter;
 public class NatsProducer extends RequestReplyProducerImp {
 
   /**
-   * The destination is the NATS Subject.
-   *
-   */
-  @Getter
-  @Setter
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0", message = "Use 'subject' instead", groups = Deprecated.class)
-  private ProduceDestination destination;
-
-  /**
    * The NATS Subject
    *
    */
   @InputFieldHint(expression = true)
   @Getter
   @Setter
-  // Needs to be @NotBlank when destination is removed.
+  @NotBlank
   private String subject;
 
   private transient boolean destWarning;
@@ -72,9 +59,7 @@ public class NatsProducer extends RequestReplyProducerImp {
 
   @Override
   public void prepare() throws CoreException {
-    DestinationHelper.logWarningIfNotNull(destWarning, () -> destWarning = true, getDestination(),
-        "{} uses destination, use 'subject' instead", LoggingHelper.friendlyName(this));
-    DestinationHelper.mustHaveEither(getSubject(), getDestination());
+    Args.notBlank(getSubject(), "subject");
   }
 
   @Override
@@ -114,11 +99,6 @@ public class NatsProducer extends RequestReplyProducerImp {
     return reply;
   }
 
-  public NatsProducer withDestination(ProduceDestination p) {
-    setDestination(p);
-    return this;
-  }
-
   protected byte[] toByteArray(AdaptrisMessage msg, long maxSize) throws Exception {
     byte[] bytes = encode(msg);
     if (bytes.length > maxSize) {
@@ -130,6 +110,11 @@ public class NatsProducer extends RequestReplyProducerImp {
 
   @Override
   public String endpoint(AdaptrisMessage msg) throws ProduceException {
-    return DestinationHelper.resolveProduceDestination(getSubject(), getDestination(), msg);
+    return DestinationHelper.resolveProduceDestination(getSubject(), msg);
+  }
+
+  public NatsProducer withSubject(String s) {
+    setSubject(s);
+    return this;
   }
 }

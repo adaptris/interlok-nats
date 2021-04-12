@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ConfiguredDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.StandaloneProducer;
@@ -22,14 +21,14 @@ public class NatsProducerTest {
 
   @Test
   public void testToByteArray() throws Exception {
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
     assertNotNull(p.toByteArray(msg, 1024L));
   }
 
   @Test(expected = ProduceException.class)
   public void testToByteArray_ExceedsMax() throws Exception {
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
     assertNotNull(p.toByteArray(msg, 1L));
   }
@@ -37,7 +36,7 @@ public class NatsProducerTest {
   @Test
   public void testProduce() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     StandaloneProducer producer = new StandaloneProducer(conn, p);
     try {
       LifecycleHelper.initAndStart(producer);
@@ -53,7 +52,7 @@ public class NatsProducerTest {
   @Test(expected = ServiceException.class)
   public void testProduce_Exception() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     StandaloneProducer producer = new StandaloneProducer(conn, p);
     try {
       LifecycleHelper.initAndStart(producer);
@@ -67,7 +66,7 @@ public class NatsProducerTest {
   @Test
   public void testRequest() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     StandaloneRequestor requestor = new StandaloneRequestor(conn, p);
     try {
       LifecycleHelper.initAndStart(requestor);
@@ -84,7 +83,7 @@ public class NatsProducerTest {
   @Test(expected = ServiceException.class)
   public void testRequest_Exception() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     StandaloneRequestor requestor = new StandaloneRequestor(conn, p);
     try {
       LifecycleHelper.initAndStart(requestor);
@@ -98,7 +97,7 @@ public class NatsProducerTest {
   @Test(expected = ServiceException.class)
   public void testRequest_Timeout() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
-    NatsProducer p = new NatsProducer().withDestination(new ConfiguredDestination("hello"));
+    NatsProducer p = new NatsProducer().withSubject("hello");
     StandaloneRequestor requestor = new StandaloneRequestor(conn, p);
     try {
       LifecycleHelper.initAndStart(requestor);
