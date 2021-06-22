@@ -100,7 +100,10 @@ def versionDir = "$buildDir/version"
 
 repositories {
   mavenCentral()
-  maven { url "$defaultNexusRepo" }
+  maven {
+    url "$defaultNexusRepo"
+    allowInsecureProtocol true
+  }
   maven { url "$nexusBaseUrl/content/groups/public" }
   maven { url "$nexusBaseUrl/content/groups/interlok" }
   maven { url 'https://jitpack.io' }
