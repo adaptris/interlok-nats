@@ -91,6 +91,12 @@ ext.buildUtil = [
   }
 ]
 
+// Disable gradle module generation since we probably don't want
+// xxx.module files in your repository.
+tasks.withType(GenerateModuleMetadata) {
+  enabled = false
+}
+
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 group   = 'com.adaptris'
