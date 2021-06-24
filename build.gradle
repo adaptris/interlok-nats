@@ -2,7 +2,6 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.filters.*
 
 plugins {
-  id 'java'
   id 'java-library'
   id 'maven-publish'
   id 'jacoco'
@@ -14,19 +13,19 @@ plugins {
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.2-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.2-SNAPSHOT'
-  nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
-  mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.2-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.2-SNAPSHOT'
+  nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
+  mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
-  repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
-  repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
-  defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  repoUsername = project.findProperty('repoUsername') ?: 'unknown'
+  repoPassword = project.findProperty('repoPassword') ?: 'unknown'
+  defaultNexusRepo = project.findProperty('defaultNexusRepo') ?: 'unknown'
+  interlokJavadocs= project.findProperty('interlokJavadocs') ?: javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
+  interlokCommonJavadocs= project.findProperty('interlokCommonJavadocs') ?: javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
-  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
-  interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
 
+  delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   componentName='Interlok Messaging/NATS'
   componentDesc="Using NATS.io as a messaging platform"
 
@@ -106,9 +105,11 @@ def versionDir = "$buildDir/version"
 
 repositories {
   mavenCentral()
-  maven {
-    url "$defaultNexusRepo"
-    allowInsecureProtocol true
+  if (defaultNexusRepo != "unknown") {
+    maven {
+      url "$defaultNexusRepo"
+      allowInsecureProtocol true
+    }
   }
   maven { url "$nexusBaseUrl/content/groups/public" }
   maven { url "$nexusBaseUrl/content/groups/interlok" }
@@ -383,7 +384,7 @@ spotbugsTest.enabled = false
 
 dependencyCheck  {
   suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
-  scanConfigurations = [ "compileClasspath", "runtimeClasspath" ]
+  scanConfigurations = [ "api", "compileClasspath", "runtimeClasspath" ]
   formats = [ "HTML", "JUNIT" ]
   junitFailOnCVSS = 7.0
   failBuildOnCVSS = 7.0
