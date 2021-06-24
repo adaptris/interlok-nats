@@ -90,18 +90,18 @@ ext.buildUtil = [
   }
 ]
 
-// Disable gradle module generation since we probably don't want
-// xxx.module files in your repository.
-tasks.withType(GenerateModuleMetadata) {
-  enabled = false
-}
-
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 group   = 'com.adaptris'
 version = releaseVersion
 generateLombokConfig.enabled = false
 def versionDir = "$buildDir/version"
+
+// Disable gradle module generation since we probably don't want
+// xxx.module files in your repository.
+tasks.withType(GenerateModuleMetadata) {
+  enabled = false
+}
 
 repositories {
   mavenCentral()
@@ -239,18 +239,21 @@ jacocoTestReport {
     }
 }
 
-task buildUnitTestProperties(type: Copy) {
-  def propertyFile = buildUtil.propertyTemplate(buildUtil.testResourcesDir(), "unit-tests.properties.template")
-  delete file(buildUtil.testResourcesDir() + "/unit-tests.properties")
-  from file(buildUtil.testResourcesDir() + "/" + propertyFile)
-  into (buildUtil.testResourcesDir())
-  rename { String fileName ->
-    fileName.replace(propertyFile, 'unit-tests.properties')
+task buildUnitTestProperties() {
+  doLast {
+    delete file(buildUtil.testResourcesDir() + "/unit-tests.properties")
+    def propertyFile = buildUtil.propertyTemplate(buildUtil.testResourcesDir(), "unit-tests.properties.template")
+    ant.copy(file: buildUtil.testResourcesDir() + "/" + propertyFile,
+             tofile: buildUtil.testResourcesDir() + '/unit-tests.properties') {
+      filterset {
+         filter(token: "JAVA_HOME", value: System.getProperty("java.home").replaceAll("\\\\", "/"))
+         filter(token: "BASE_DIR", value: project.projectDir.getCanonicalPath().replaceAll("\\\\", "/"))
+         filter(token: "BUILD_DIR", value: project.buildDir.getCanonicalPath().replaceAll("\\\\", "/"))
+      }
+    }
   }
-  filter(ReplaceTokens, tokens: [JAVA_HOME: System.getProperty("java.home").replaceAll("\\\\", "/")])
-  filter(ReplaceTokens, tokens: [BASE_DIR: project.projectDir.getCanonicalPath().replaceAll("\\\\", "/")])
-  filter(ReplaceTokens, tokens: [BUILD_DIR: project.buildDir.getCanonicalPath().replaceAll("\\\\", "/")])
 }
+
 
 task deleteGeneratedFiles(type: Delete) {
   delete file(buildUtil.testResourcesDir() + "/unit-tests.properties"), delombokTargetDir, "derby.log"
