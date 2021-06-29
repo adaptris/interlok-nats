@@ -87,7 +87,12 @@ ext.buildUtil = [
       return file.getName()
     }
     return filename
+  },
+
+  unitTestTemplate: {
+    return buildUtil.propertyTemplate(buildUtil.testResourcesDir(), "unit-tests.properties.template")
   }
+
 ]
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -242,8 +247,7 @@ jacocoTestReport {
 task buildUnitTestProperties() {
   doLast {
     delete file(buildUtil.testResourcesDir() + "/unit-tests.properties")
-    def propertyFile = buildUtil.propertyTemplate(buildUtil.testResourcesDir(), "unit-tests.properties.template")
-    ant.copy(file: buildUtil.testResourcesDir() + "/" + propertyFile,
+    ant.copy(file: buildUtil.testResourcesDir() + "/" + buildUtil.unitTestTemplate(),
              tofile: buildUtil.testResourcesDir() + '/unit-tests.properties') {
       filterset {
          filter(token: "JAVA_HOME", value: System.getProperty("java.home").replaceAll("\\\\", "/"))
