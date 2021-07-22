@@ -183,6 +183,12 @@ jar {
                "Implementation-Vendor-Id": project.group,
                "Implementation-Vendor": organizationName)
   }
+  metaInf {
+    from ("$rootDir") {
+      include 'LICENSE*'
+      include 'NOTICE*'
+    }
+  }
 }
 
 
@@ -274,8 +280,14 @@ task examplesJar(type: Jar, dependsOn: test) {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.extensions.delombokTask
+  classifier = 'sources'
+  from sourceSets.main.extensions.delombokTask
+  metaInf {
+    from ("$rootDir") {
+      include 'LICENSE*'
+      include 'NOTICE*'
+    }
+  }
 }
 
 task umlJavadoc(type: Javadoc) {
