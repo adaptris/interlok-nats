@@ -104,8 +104,18 @@ def versionDir = "$buildDir/version"
 
 // Disable gradle module generation since we probably don't want
 // xxx.module files in your repository.
-tasks.withType(GenerateModuleMetadata) {
-  enabled = false
+allprojects {
+  tasks.withType(Jar) {
+    metaInf {
+      from ("$rootDir") {
+        include 'LICENSE*'
+        include 'NOTICE*'
+      }
+    }
+  }
+  tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+  }
 }
 
 repositories {
@@ -182,12 +192,6 @@ jar {
                "Implementation-Version": project.version,
                "Implementation-Vendor-Id": project.group,
                "Implementation-Vendor": organizationName)
-  }
-  metaInf {
-    from ("$rootDir") {
-      include 'LICENSE*'
-      include 'NOTICE*'
-    }
   }
 }
 
@@ -282,12 +286,6 @@ task examplesJar(type: Jar, dependsOn: test) {
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier = 'sources'
   from sourceSets.main.extensions.delombokTask
-  metaInf {
-    from ("$rootDir") {
-      include 'LICENSE*'
-      include 'NOTICE*'
-    }
-  }
 }
 
 task umlJavadoc(type: Javadoc) {
