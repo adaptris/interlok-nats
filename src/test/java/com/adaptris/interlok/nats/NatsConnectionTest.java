@@ -1,16 +1,20 @@
 package com.adaptris.interlok.nats;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.util.TimeInterval;
+
 import io.nats.client.Dispatcher;
 
 public class NatsConnectionTest {
-
 
   @Test
   public void testLifecycle() throws Exception {
@@ -45,10 +49,13 @@ public class NatsConnectionTest {
     }
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testClientDispatcher_IllegalState() throws Exception {
     MockNatsConnection c = new MockNatsConnection();
-    c.createDispatcher((msg) -> {
+
+    assertThrows(IllegalStateException.class, () -> {
+      c.createDispatcher((msg) -> {
+      });
     });
   }
 
@@ -70,7 +77,8 @@ public class NatsConnectionTest {
     }
   }
 
-
   private class CustomException extends Exception {
+    private static final long serialVersionUID = -1409838507657865817L;
   }
+
 }

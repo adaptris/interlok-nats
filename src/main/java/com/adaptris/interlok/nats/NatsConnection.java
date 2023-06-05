@@ -2,11 +2,14 @@ package com.adaptris.interlok.nats;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.lang3.ObjectUtils;
+
 import com.adaptris.core.AllowsRetriesConnection;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.util.TimeInterval;
+
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.MessageHandler;
@@ -22,7 +25,8 @@ public abstract class NatsConnection extends AllowsRetriesConnection {
   private transient List<Dispatcher> dispatchers = new ArrayList<>();
 
   @Override
-  protected void prepareConnection() throws CoreException {}
+  protected void prepareConnection() throws CoreException {
+  }
 
   @Override
   protected void initConnection() throws CoreException {
@@ -36,10 +40,12 @@ public abstract class NatsConnection extends AllowsRetriesConnection {
   }
 
   @Override
-  protected void startConnection() throws CoreException {}
+  protected void startConnection() throws CoreException {
+  }
 
   @Override
-  protected void stopConnection() {}
+  protected void stopConnection() {
+  }
 
   @Override
   protected void closeConnection() {
@@ -102,9 +108,11 @@ public abstract class NatsConnection extends AllowsRetriesConnection {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends NatsConnection> T withConnectionRetries(int i, TimeInterval t) {
     setConnectionAttempts(i);
     setConnectionRetryInterval(t);
     return (T) this;
   }
+
 }
