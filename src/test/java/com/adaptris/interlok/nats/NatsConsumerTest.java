@@ -1,15 +1,20 @@
 package com.adaptris.interlok.nats;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.charset.StandardCharsets;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.interlok.junit.scaffolding.BaseCase;
+
 import io.nats.client.Message;
 
 public class NatsConsumerTest {
@@ -68,7 +73,7 @@ public class NatsConsumerTest {
     }
   }
 
-  @Test(expected = CoreException.class)
+  @Test
   public void testConsumer_ConnectionException() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(true, false);
     MockMessageListener mockListener = new MockMessageListener();
@@ -77,13 +82,13 @@ public class NatsConsumerTest {
     StandaloneConsumer consumer = new StandaloneConsumer(conn, c);
     consumer.registerAdaptrisMessageListener(mockListener);
     try {
-      LifecycleHelper.initAndStart(consumer);
+      assertThrows(CoreException.class, () -> LifecycleHelper.initAndStart(consumer));
     } finally {
       LifecycleHelper.stopAndClose(consumer);
     }
   }
 
-  @Test(expected = CoreException.class)
+  @Test
   public void testConsumer_ConsumerException() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
     MockMessageListener mockListener = new MockMessageListener();
@@ -91,9 +96,10 @@ public class NatsConsumerTest {
     StandaloneConsumer consumer = new StandaloneConsumer(conn, c);
     consumer.registerAdaptrisMessageListener(mockListener);
     try {
-      LifecycleHelper.initAndStart(consumer);
+      assertThrows(CoreException.class, () -> LifecycleHelper.initAndStart(consumer));
     } finally {
       LifecycleHelper.stopAndClose(consumer);
     }
   }
+
 }

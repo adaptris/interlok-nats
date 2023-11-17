@@ -1,13 +1,17 @@
 package com.adaptris.interlok.nats;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
@@ -15,6 +19,7 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.StandaloneRequestor;
 import com.adaptris.core.util.LifecycleHelper;
+
 import io.nats.client.Connection;
 
 public class NatsProducerTest {
@@ -26,11 +31,12 @@ public class NatsProducerTest {
     assertNotNull(p.toByteArray(msg, 1024L));
   }
 
-  @Test(expected = ProduceException.class)
+  @Test
   public void testToByteArray_ExceedsMax() throws Exception {
     NatsProducer p = new NatsProducer().withSubject("hello");
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-    assertNotNull(p.toByteArray(msg, 1L));
+
+    assertThrows(ProduceException.class, () -> p.toByteArray(msg, 1L));
   }
 
   @Test
@@ -49,7 +55,7 @@ public class NatsProducerTest {
     }
   }
 
-  @Test(expected = ServiceException.class)
+  @Test
   public void testProduce_Exception() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
     NatsProducer p = new NatsProducer().withSubject("hello");
@@ -57,7 +63,8 @@ public class NatsProducerTest {
     try {
       LifecycleHelper.initAndStart(producer);
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-      producer.doService(msg);
+
+      assertThrows(ServiceException.class, () -> producer.doService(msg));
     } finally {
       LifecycleHelper.stopAndClose(producer);
     }
@@ -80,7 +87,7 @@ public class NatsProducerTest {
     }
   }
 
-  @Test(expected = ServiceException.class)
+  @Test
   public void testRequest_Exception() throws Exception {
     MockNatsConnection conn = new MockNatsConnection(false, true);
     NatsProducer p = new NatsProducer().withSubject("hello");
@@ -88,13 +95,14 @@ public class NatsProducerTest {
     try {
       LifecycleHelper.initAndStart(requestor);
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-      requestor.doService(msg);
+
+      assertThrows(ServiceException.class, () -> requestor.doService(msg));
     } finally {
       LifecycleHelper.stopAndClose(requestor);
     }
   }
 
-  @Test(expected = ServiceException.class)
+  @Test
   public void testRequest_Timeout() throws Exception {
     MockNatsConnection conn = new MockNatsConnection();
     NatsProducer p = new NatsProducer().withSubject("hello");
@@ -103,9 +111,10 @@ public class NatsProducerTest {
       LifecycleHelper.initAndStart(requestor);
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
       requestor.doService(msg);
-      requestor.doService(msg); // 2nd time around will return null, thus causing a ProduceException...
+      assertThrows(ServiceException.class, () -> requestor.doService(msg)); // 2nd time around will return null, thus causing a ProduceException...
     } finally {
       LifecycleHelper.stopAndClose(requestor);
     }
   }
+  
 }
