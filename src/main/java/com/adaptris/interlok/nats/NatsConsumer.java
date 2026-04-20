@@ -1,6 +1,6 @@
 package com.adaptris.interlok.nats;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import org.apache.commons.lang3.StringUtils;
 
