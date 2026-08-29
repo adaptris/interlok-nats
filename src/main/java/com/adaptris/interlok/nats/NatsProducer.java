@@ -5,7 +5,7 @@ import static com.adaptris.core.AdaptrisMessageFactory.defaultIfNull;
 import java.time.Duration;
 import java.util.Optional;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
